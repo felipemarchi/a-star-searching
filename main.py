@@ -1,9 +1,15 @@
 from utils import *
+from random import randint
 
 if __name__ == "__main__":
     # Heurística Definition
     def heuristica(estadoAtual, estadoFinal):
-        return abs(estadoFinal[0] - estadoAtual[0]) + abs(estadoFinal[1] - estadoAtual[1]) 
+        #valor D que é o minimo dos custos de alteração de estado, logo, D=1
+        return abs(estadoAtual[0] - estadoFinal[0]) + abs(estadoAtual[1] - estadoFinal[1])
+    # 0 é a primeira coordenada e o 1 é a segunda
+
+    def heuristica2(estadoAtual, guarda):
+        return min( heuristica(estadoAtual, guarda[0]), heuristica(estadoAtual, guarda[1]))
 
     # A* Definition
     def search(estadoInicial, estadoFinal, bloqueios, heuristica):
@@ -20,7 +26,7 @@ if __name__ == "__main__":
 
         # busca
         while estadoAtual != estadoFinal:
-            listaExpansao = getAdjacentes(estadoAtual, listaAberta, listaFechada, bloqueios) 
+            listaExpansao = getAdjacentes(estadoAtual, listaAberta, listaFechada, bloqueios)
             listaAberta = abrirLista(listaExpansao, estadoInicial, estadoFinal, estadoAtual, listaAberta, listaFechada, heuristica)
 
             # fechar primeiro nó da listaAberta
@@ -33,21 +39,53 @@ if __name__ == "__main__":
             if len(listaAberta) != 0:
                 estadoAtual = listaAberta[0].estado
 
-        # fim da busca        
+        # fim da busca
         listaFechada.append(listaAberta[0])
 
         return melhorCaminho(estadoAtual, estadoInicial, listaFechada)
 
     # Game config
-    estadoInicial = (0,0)
-    estadoFinal = (6,6)
-    bloqueios = [(0,5),(1,5),(2,5),(3,5),(5,5),(6,5)]    
+    print("Digite as coordenadas [separadas por uma virgula]: \n")
+    x, y = input().split(',')
+    x, y = int(x), int(y)
+    estadoInicial = (x, y)
+    xfinal, yfinal = randint(0, 6), randint(0, 6)
+    estadoFinal = (xfinal, yfinal)
+    print("Estado Objetivo:", estadoFinal)
 
-    # Run
-    caminho = search(estadoInicial, estadoFinal, bloqueios, heuristica)
+    qtdbloqueios = randint(3, 6) #mudar no relatorio
+    qtdguardas = randint(2, 3)
+    #print("Quantidade de bloqueios: ", qtdbloqueios)
+    cordbloqueios_set = set()
+    while len(cordbloqueios_set) < qtdbloqueios:
+        x, y = 6, 0
+        while (x, y) == (6, 0):
+            x, y = randint(0, 6), randint(0, 6)
+            cordbloqueios_set.add((x, y))
+    bloqueios = cordbloqueios_set
+    print("Bloqueios: ", bloqueios)
 
-    # Results
-    for estado in caminho:
-        print('Estado:', estado, 'Heurística:', heuristica(estado, estadoFinal))
+    cordguarda_set = set()
+    while len(cordguarda_set) < qtdguardas:
+        x, y = 6, 0
+        while (x, y) == (6, 0):
+            x, y = randint(0, 6), randint(0, 6)
+            cordguarda_set.add((x, y))
+    cordguarda_set.add((1, 2)) #depois apaga
+    guarda = cordguarda_set
+    print("Guardas: ", guarda)
 
-    print("Quantidade de Movimentos:", len(caminho) - 1)
+    if estadoInicial in bloqueios:
+        print("O estado inicial escolhido é invalido(tentou inserir em um bloqueio)")
+    else:
+        # Run
+        caminho = search(estadoInicial, estadoFinal, bloqueios, heuristica)
+        # Results
+        #arrumar isso aqui, pois ele nao ta pegando mesmo que tenha guardas no caminho
+        if (guarda in caminho):
+            print("Ronaldinho foi preso")
+        else:
+            for estado in caminho:
+                print('Estado:', estado, 'Heurística:', heuristica(estado, estadoFinal))
+            print('Ronaldinho conseguiu driblar os guardas da prisão!')
+            print("Quantidade de Movimentos:", len(caminho) - 1)

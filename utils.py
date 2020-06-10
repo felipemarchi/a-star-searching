@@ -1,3 +1,4 @@
+import time
 class No:
     def __init__(self, estado, total_F, custo_G, heuristica_H, pai):
         self.estado = estado
@@ -74,6 +75,8 @@ def abrirLista(listaExpansao, estadoInicial, estadoFinal, estadoAtual, listaAber
         total_F = custo_G + heuristica_H
         novo_no = No(estado, total_F, custo_G, heuristica_H, estadoAtual)
         listaAberta.append(novo_no)
+    #print("Valores", estadoAtual,"\n-- F(n) =", total_F,"\n h(n) =", heuristica_H,"\n g(n) =", custo_G)
+
     return listaAberta
 
 def melhorCaminho(estadoAtual, estadoInicial, listaFechada):
