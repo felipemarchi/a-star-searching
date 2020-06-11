@@ -1,15 +1,15 @@
 from utils import *
 from random import randint
+import sys
 
 if __name__ == "__main__":
-    # Heurística Definition
+    # Heurística Definitions
     def heuristica(estadoAtual, estadoFinal):
-        #valor D que é o minimo dos custos de alteração de estado, logo, D=1
+        #valor D que é o minimo dos custos de alteração de estado, logo, D = 1
         return abs(estadoAtual[0] - estadoFinal[0]) + abs(estadoAtual[1] - estadoFinal[1])
-    # 0 é a primeira coordenada e o 1 é a segunda
 
     def heuristica2(estadoAtual, guarda):
-        return min( heuristica(estadoAtual, guarda[0]), heuristica(estadoAtual, guarda[1]))
+        return min(heuristica(estadoAtual, guarda[0]), heuristica(estadoAtual, guarda[1]))
 
     # A* Definition
     def search(estadoInicial, estadoFinal, bloqueios, heuristica):
@@ -44,48 +44,48 @@ if __name__ == "__main__":
 
         return melhorCaminho(estadoAtual, estadoInicial, listaFechada)
 
-    # Game config
-    print("Digite as coordenadas [separadas por uma virgula]: \n")
-    x, y = input().split(',')
-    x, y = int(x), int(y)
-    estadoInicial = (x, y)
+    # Game configs
     xfinal, yfinal = randint(0, 6), randint(0, 6)
     estadoFinal = (xfinal, yfinal)
-    print("Estado Objetivo:", estadoFinal)
-
-    qtdbloqueios = randint(3, 6) #mudar no relatorio
-    qtdguardas = randint(2, 3)
-    #print("Quantidade de bloqueios: ", qtdbloqueios)
+    #print("Estado Objetivo: ", estadoFinal)
+    
+    qtdbloqueios = randint(3, 6)
     cordbloqueios_set = set()
     while len(cordbloqueios_set) < qtdbloqueios:
-        x, y = 6, 0
-        while (x, y) == (6, 0):
-            x, y = randint(0, 6), randint(0, 6)
+        x, y = randint(0, 6), randint(0, 6)
+        if (x, y) != estadoFinal and (x, y) not in cordbloqueios_set:
             cordbloqueios_set.add((x, y))
     bloqueios = cordbloqueios_set
-    print("Bloqueios: ", bloqueios)
+    #print("Bloqueios: ", bloqueios)
 
-    cordguarda_set = set()
-    while len(cordguarda_set) < qtdguardas:
-        x, y = 6, 0
-        while (x, y) == (6, 0):
-            x, y = randint(0, 6), randint(0, 6)
-            cordguarda_set.add((x, y))
-    cordguarda_set.add((1, 2)) #depois apaga
-    guarda = cordguarda_set
-    print("Guardas: ", guarda)
+    qtdguardas = randint(2, 3)
+    cordguardas_set = set()
+    while len(cordguardas_set) < qtdguardas:
+        x, y = randint(0, 6), randint(0, 6)
+        if (x, y) != estadoFinal and (x, y) not in cordbloqueios_set and (x, y) not in cordguardas_set:
+            cordguardas_set.add((x, y))
+    guardas = cordguardas_set
+    #print("Guardas: ", guardas)
 
-    if estadoInicial in bloqueios:
-        print("O estado inicial escolhido é invalido(tentou inserir em um bloqueio)")
-    else:
-        # Run
-        caminho = search(estadoInicial, estadoFinal, bloqueios, heuristica)
-        # Results
-        #arrumar isso aqui, pois ele nao ta pegando mesmo que tenha guardas no caminho
-        if (guarda in caminho):
-            print("Ronaldinho foi preso")
-        else:
-            for estado in caminho:
-                print('Estado:', estado, 'Heurística:', heuristica(estado, estadoFinal))
-            print('Ronaldinho conseguiu driblar os guardas da prisão!')
-            print("Quantidade de Movimentos:", len(caminho) - 1)
+    while True:
+        print("Digite as coordenadas [separadas por uma virgula]:")
+        x, y = input().split(',')
+        x, y = int(x), int(y)
+        if (x, y) != estadoFinal and (x, y) not in cordbloqueios_set and (x, y) not in cordguardas_set:
+            if x >= 0 and x <= 6 and y >= 0 and y <= 6:
+                estadoInicial = (x, y)
+                break
+        print("O estado inicial escolhido é invalido - posição já ocupada ou não existente")
+    
+    # Run
+    caminho = search(estadoInicial, estadoFinal, bloqueios, heuristica)
+
+    # Results
+    for estado in caminho:   
+        print('Estado:', estado, 'Heurística:', heuristica(estado, estadoFinal))     
+        if (estado in guardas):
+            print("GAME OVER - Ronaldinho foi preso")
+            sys.exit()
+
+    print('VICTORY - Ronaldinho fugiu')
+    print("Quantidade de Movimentos:", len(caminho) - 1)
