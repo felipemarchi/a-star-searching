@@ -1,4 +1,3 @@
-import time
 class No:
     def __init__(self, estado, total_F, custo_G, heuristica_H, pai):
         self.estado = estado
@@ -68,15 +67,13 @@ def todosAdjacentesValidos(estadoAtual, bloqueios):
         return False
     return [candidato for candidato in candidatos if isValidState(candidato)]
 
-def abrirLista(listaExpansao, estadoInicial, estadoFinal, estadoAtual, listaAberta, listaFechada, funcaoHeuristica):
+def abrirLista(listaExpansao, estadoInicial, estadoFinal, estadoAtual, listaAberta, listaFechada, funcaoHeuristica, funcaoHeuristica2, guardas):
     for estado in listaExpansao:
         custo_G = calcularCusto(estadoInicial, estadoAtual, listaFechada, listaAberta) + 1
-        heuristica_H = funcaoHeuristica(estado, estadoFinal)
+        heuristica_H = funcaoHeuristica(estado, estadoFinal) + funcaoHeuristica2(estado, guardas)
         total_F = custo_G + heuristica_H
         novo_no = No(estado, total_F, custo_G, heuristica_H, estadoAtual)
         listaAberta.append(novo_no)
-    #print("Valores", estadoAtual,"\n-- F(n) =", total_F,"\n h(n) =", heuristica_H,"\n g(n) =", custo_G)
-
     return listaAberta
 
 def melhorCaminho(estadoAtual, estadoInicial, listaFechada):
