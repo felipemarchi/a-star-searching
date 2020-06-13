@@ -34,7 +34,10 @@ if __name__ == "__main__":
             listaAberta = abrirLista(listaExpansao, estadoInicial, estadoFinal, estadoAtual, listaAberta, listaFechada, heuristica, heuristica2, guardas)
 
             # fechar primeiro nó da listaAberta
-            no = listaAberta[0]
+            try:
+                no = listaAberta[0]
+            except IndexError:
+                return None
             listaFechada.append(no)
             listaAberta.remove(no)
             listaAberta = reordenarLista(listaAberta)
@@ -85,14 +88,17 @@ if __name__ == "__main__":
     # User input
     def solicitarEstadoInicial(estadoFinal, bloqueios, guardas):
         while True:
-            print("Digite as coordenadas do estado inicial (Ex. 0,6)")
-            x, y = input().split(',')
-            x, y = int(x), int(y)
-            if x >= 0 and x <= 6 and y >= 0 and y <= 6:
-                if (x, y) != estadoFinal and (x, y) not in bloqueios and (x, y) not in guardas:
-                    estadoInicial = (x, y)
-                    break
-            print("Estado inicial inválido - posição já ocupada ou não existente")
+            print("Digite as coordenadas do estado inicial entre 0 e 6 (Ex. 0,6)")
+            entrada = input()
+            if entrada and len(entrada) == 3 and entrada[1] == ',' and entrada[0].isdigit() and entrada[2].isdigit():
+                x, y = entrada.split(',')
+                x, y = int(x), int(y)
+                if x >= 0 and x <= 6 and y >= 0 and y <= 6:
+                    if (x, y) != estadoFinal and (x, y) not in bloqueios and (x, y) not in guardas:
+                        estadoInicial = (x, y)
+                        break
+                print("Estado inicial inválido - posição já ocupada ou não existente")
+            print("Entrada inválida")
         return estadoInicial
 
     # Game
@@ -114,14 +120,15 @@ if __name__ == "__main__":
 
         # Results
         foiPreso = False
-        for estado in caminho:   
-            valorFnTotal = heuristica(estado, estadoFinal) + heuristica2(estado, guardas)
-            print(' Estado:', estado, 'F(n):', valorFnTotal)   
-            if (estado in guardas):
-                print(" DERROTA - Havia um guarda em seu caminho")
-                qtdDerrotas += 1
-                foiPreso = True
-                break
+        if caminho:
+            for estado in caminho:   
+                valorFnTotal = heuristica(estado, estadoFinal) + heuristica2(estado, guardas)
+                print(' Estado:', estado, 'F(n):', valorFnTotal)   
+                if (estado in guardas):
+                    print(" DERROTA - Havia um guarda em seu caminho")
+                    qtdDerrotas += 1
+                    foiPreso = True
+                    break
         
         if not foiPreso:
             break
@@ -129,6 +136,8 @@ if __name__ == "__main__":
     print("\nRESULTADO -----------------------------------------------------------")
     if qtdDerrotas == 3:
         print(" GAME OVER - Após 3 tentativas, você foi realocado de prisão")
+    elif caminho == None:
+        print(" GAME OVER - Literalmente, não havia uma rota de fuga! Que azar!")
     else:
         print(" VITÓRIA - Você fugiu em", tentativas, "tentativa(s)")
         print(" Quantidade de Movimentos:", len(caminho) - 1)
