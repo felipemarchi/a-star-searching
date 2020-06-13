@@ -40,7 +40,7 @@ def calcularCusto(estadoInicial, estadoAtual, listaFechada, listaAberta):
                         aux = False
         return G
 
-def getAdjacentes(estadoAtual, listaAberta, listaFechada, bloqueios):
+def getAdjacentes(estadoAtual, listaAberta, listaFechada, bloqueios, arvore):
     listaExpansao = []
     adjacents = todosAdjacentesValidos(estadoAtual, bloqueios)
     for adjacent in adjacents:
@@ -53,6 +53,7 @@ def getAdjacentes(estadoAtual, listaAberta, listaFechada, bloqueios):
                 valido = False
         if valido == True:
             listaExpansao.append(adjacent)
+            arvore.append(adjacent)
     return listaExpansao
 
 def todosAdjacentesValidos(estadoAtual, bloqueios):
@@ -74,6 +75,14 @@ def abrirLista(listaExpansao, estadoInicial, estadoFinal, estadoAtual, listaAber
         total_F = custo_G + heuristica_H
         novo_no = No(estado, total_F, custo_G, heuristica_H, estadoAtual)
         listaAberta.append(novo_no)
+    print("Lista aberta expandindo!")
+    for no in listaAberta:
+        print(no.estado)
+    print("----")
+    print("Lista Fechada expandindo!")
+    for no in listaFechada:
+        print(no.estado)
+    print("----")
     return listaAberta
 
 def melhorCaminho(estadoAtual, estadoInicial, listaFechada):

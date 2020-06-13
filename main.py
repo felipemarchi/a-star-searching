@@ -14,10 +14,9 @@ if __name__ == "__main__":
             return 0
 
     # A* Definition
-    def search(estadoInicial, estadoFinal, bloqueios, guardas, heuristica, heuristica2):
+    def search(estadoInicial, estadoFinal, bloqueios, guardas, heuristica, heuristica2, listaAberta, listaFechada, arvore):
         estadoAtual = estadoInicial
-        listaFechada = []
-        listaAberta = []
+        arvore.append(estadoInicial)
 
         # primeiro nó da árvore
         custo_G = 0
@@ -28,7 +27,10 @@ if __name__ == "__main__":
 
         # busca
         while estadoAtual != estadoFinal:
-            listaExpansao = getAdjacentes(estadoAtual, listaAberta, listaFechada, bloqueios)
+            listaExpansao = getAdjacentes(estadoAtual, listaAberta, listaFechada, bloqueios, arvore)
+            print("Árvore expandindo!")
+            print(arvore)
+            print("----")
             listaAberta = abrirLista(listaExpansao, estadoInicial, estadoFinal, estadoAtual, listaAberta, listaFechada, heuristica, heuristica2, guardas)
 
             # fechar primeiro nó da listaAberta
@@ -43,7 +45,6 @@ if __name__ == "__main__":
 
         # fim da busca
         listaFechada.append(listaAberta[0])
-
         return melhorCaminho(estadoAtual, estadoInicial, listaFechada)
 
     # Game configs Definitions
@@ -99,6 +100,9 @@ if __name__ == "__main__":
     adjacentesFinal = todosAdjacentesValidos(estadoFinal, [])
     bloqueios = blockConfig(estadoFinal, adjacentesFinal)
     guardas = guardaConfig(estadoFinal, bloqueios, adjacentesFinal)
+    listaAberta = []
+    listaFechada = []
+    arvore = []
     
     tentativas = 0
     qtdDerrotas = 0
@@ -106,7 +110,7 @@ if __name__ == "__main__":
         tentativas = i + 1        
         print("\nRODADA",tentativas,"------------------------------------------------------------")
         estadoInicial = solicitarEstadoInicial(estadoFinal, bloqueios, guardas)
-        caminho = search(estadoInicial, estadoFinal, bloqueios, guardas, heuristica, heuristica2)
+        caminho = search(estadoInicial, estadoFinal, bloqueios, guardas, heuristica, heuristica2, listaAberta, listaFechada, arvore)
 
         # Results
         foiPreso = False
@@ -136,5 +140,9 @@ if __name__ == "__main__":
 
     print("\nSAÍDA DO ALGORITMO --------------------------------------------------")
     print(" Nós abertos:")
+    for no in listaAberta:
+        print(no.estado)
     print(" Nós fechados:")
-    print(" Árvore:")
+    for no in listaFechada:
+        print(no.estado)
+    print(" Árvore:", arvore)
