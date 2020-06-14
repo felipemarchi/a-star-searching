@@ -75,14 +75,6 @@ def abrirLista(listaExpansao, estadoInicial, estadoFinal, estadoAtual, listaAber
         total_F = custo_G + heuristica_H
         novo_no = No(estado, total_F, custo_G, heuristica_H, estadoAtual)
         listaAberta.append(novo_no)
-    print("Lista aberta expandindo!")
-    for no in listaAberta:
-        print(no.estado)
-    print("----")
-    print("Lista Fechada expandindo!")
-    for no in listaFechada:
-        print(no.estado)
-    print("----")
     return listaAberta
 
 def melhorCaminho(estadoAtual, estadoInicial, listaFechada):
