@@ -303,7 +303,7 @@ if __name__ == "__main__":
                     self.dot.edge(str(item[0]),str(item[1]))
                 self.dot.render('tree.gv', view=False, format='png')
                 img = ImageTk.PhotoImage(file='tree.gv.png')
-                canvas = Canvas(self.quartoContainer, width=500, height=500)
+                canvas = Canvas(self.quartoContainer, width=500, height=1000)
                 canvas.imageList = []
                 canvas.pack()
                 canvas.create_image(0, 0, anchor="nw", image=img)
