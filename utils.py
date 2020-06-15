@@ -68,12 +68,14 @@ def todosAdjacentesValidos(estadoAtual, bloqueios):
         return False
     return [candidato for candidato in candidatos if isValidState(candidato)]
 
-def abrirLista(listaExpansao, estadoInicial, estadoFinal, estadoAtual, listaAberta, listaFechada, funcaoHeuristica, funcaoHeuristica2, guardas):
+def abrirLista(listaExpansao, estadoInicial, estadoFinal, estadoAtual, listaAberta, listaFechada, funcaoHeuristica, funcaoHeuristica2, guardas, arvore):
     for estado in listaExpansao:
         custo_G = calcularCusto(estadoInicial, estadoAtual, listaFechada, listaAberta) + 1
         heuristica_H = funcaoHeuristica(estado, estadoFinal) + funcaoHeuristica2(estado, guardas)
         total_F = custo_G + heuristica_H
         novo_no = No(estado, total_F, custo_G, heuristica_H, estadoAtual)
+        if not novo_no in arvore:
+            arvore.append({"elemento": novo_no.estado, "pai": novo_no.pai})
         listaAberta.append(novo_no)
     return listaAberta
 
