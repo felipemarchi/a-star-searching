@@ -74,8 +74,8 @@ def abrirLista(listaExpansao, estadoInicial, estadoFinal, estadoAtual, listaAber
         heuristica_H = funcaoHeuristica(estado, estadoFinal) + funcaoHeuristica2(estado, guardas)
         total_F = custo_G + heuristica_H
         novo_no = No(estado, total_F, custo_G, heuristica_H, estadoAtual)
-        if not novo_no in arvore:
-            arvore.append({"elemento": novo_no.estado, "pai": novo_no.pai})
+        arvore.node(str(novo_no.estado).replace('(', '').replace(', ', '.').replace(')', ''), str(novo_no.estado))
+        arvore.edge(str(novo_no.pai).replace('(', '').replace(', ', '.').replace(')', ''), str(novo_no.estado).replace('(', '').replace(', ', '.').replace(')', ''))
         listaAberta.append(novo_no)
     return listaAberta
 

@@ -1,7 +1,6 @@
 from utils import *
 from tkinter import *
 from random import randint
-from treelib import Node, Tree
 from graphviz import Digraph
 from PIL import ImageTk
 import sys
@@ -122,19 +121,15 @@ if __name__ == "__main__":
             heuristica_H = heuristica(estadoAtual, estadoFinal) + heuristica2(estadoAtual, guardas)
             total_F = custo_G + heuristica_H
             novo_no = No(estadoAtual, total_F, custo_G, heuristica_H, None)
-            nome = str(novo_no.estado).replace('(', '').replace(', ', '.').replace(')', '')
             self.dot = Digraph()
-            self.dot.node(nome, str(novo_no.estado))
-            self.tree = Tree()
-            self.tree.create_node(nome,nome)
+            self.dot.node(str(novo_no.estado).replace('(', '').replace(', ', '.').replace(')', ''), str(novo_no.estado))
             listaAberta.append(novo_no)
             passos = ""
-            self.arvoreJson = []
 
             # busca
             while estadoAtual != estadoFinal:
                 listaExpansao = getAdjacentes(estadoAtual, listaAberta, listaFechada, bloqueios, arvore)
-                listaAberta = abrirLista(listaExpansao, estadoInicial, estadoFinal, estadoAtual, listaAberta, listaFechada, heuristica, heuristica2, guardas, self.arvoreJson)
+                listaAberta = abrirLista(listaExpansao, estadoInicial, estadoFinal, estadoAtual, listaAberta, listaFechada, heuristica, heuristica2, guardas, self.dot)
 
                 # fechar primeiro nó da listaAberta
                 try:
@@ -142,6 +137,15 @@ if __name__ == "__main__":
                 except IndexError:
                     self.index = True
                     return None
+
+                listaFechada.append(no)
+                listaAberta.remove(no)
+                listaAberta = reordenarLista(listaAberta)
+
+                # mudar estado se ainda tiver listaAberta
+                if len(listaAberta) != 0:
+                    estadoAtual = listaAberta[0].estado
+
                 
                 passos += "Árvore expandindo!\n" + str(arvore) + "\n----\n"
                 passos += "Lista aberta expandindo!\n"
@@ -154,21 +158,6 @@ if __name__ == "__main__":
                 passos += "\n----\n"
 
                 self.passos["text"] = passos
-
-                listaFechada.append(no)
-                listaAberta.remove(no)
-                listaAberta = reordenarLista(listaAberta)
-
-                # mudar estado se ainda tiver listaAberta
-                if len(listaAberta) != 0:
-                    estadoAtual = listaAberta[0].estado
-            for item in self.arvoreJson:
-                nomeFilho = str(item["elemento"]).replace('(', '').replace(', ', '.').replace(')', '')
-                nomePai = str(item["pai"]).replace('(', '').replace(', ', '.').replace(')', '')
-                self.dot.node(nomeFilho,str(item["elemento"]))
-                self.tree.create_node(nomeFilho,nomeFilho,parent=nomePai)
-            self.elementos = json.loads(self.tree.to_json(with_data=False))
-            json.dumps(self.elementos, indent=4)
             
             # fim da busca
             listaFechada.append(listaAberta[0])
@@ -220,17 +209,6 @@ if __name__ == "__main__":
                 return None
             self.mensagem["text"] = "Entrada inválida"
             return None
-
-        # Criar árvore
-        def criarArvore(self,vertice, pai=None):
-            node = next(iter(vertice.keys()))
-            if pai is not None:
-                self.vertices.append((pai, node))
-            for item in vertice[node]["children"]:
-                if isinstance(item, dict):
-                    self.criarArvore(item, pai=node)
-                else:
-                    self.vertices.append((node, item))
 
         # Game
         def rodarJogo(self):
@@ -289,6 +267,7 @@ if __name__ == "__main__":
             self.mapa["text"] = ("MAPA DO JOGO\nBloqueios: " + str(bloqueios) + "\nGuardas: " + str(guardas) + "\nEstado Final: " + str(estadoFinal))
             if(not self.index):
                 textoAberto = ""
+                listaAberta.pop(0)
                 for no in listaAberta:
                     textoAberto += str(no.estado) + " "
 
@@ -297,13 +276,10 @@ if __name__ == "__main__":
                     textoFechado += str(no.estado) + " "
 
                 self.saida["text"] = ("SAÍDA DO ALGORITMO\nNós abertos:" + textoAberto + "\nNós fechados:" + textoFechado + "\nÁrvore:" + str(arvore))
-                self.vertices = []
-                self.criarArvore(self.elementos)
-                for item in self.vertices:
-                    self.dot.edge(str(item[0]),str(item[1]))
+                
                 self.dot.render('tree.gv', view=False, format='png')
                 img = ImageTk.PhotoImage(file='tree.gv.png')
-                canvas = Canvas(self.quartoContainer, width=500, height=1000)
+                canvas = Canvas(self.quartoContainer, width=1000, height=1000)
                 canvas.imageList = []
                 canvas.pack()
                 canvas.create_image(0, 0, anchor="nw", image=img)

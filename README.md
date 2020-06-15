@@ -1,7 +1,6 @@
 # a-star-searching
 - Instalar o Python
 - Instalar pacotes com "pip install":
-    - "treelib"
     - "graphviz"
     - "pillow"
 - Baixar o Graphviz em "https://graphviz.org/_pages/Download/Download_windows.html"
