@@ -110,13 +110,13 @@ if __name__ == "__main__":
         # Heurística Definitions
         def heuristica(self, estadoAtual, estadoFinal):
             mod = self.modificadorRandom()
-            return mod*abs(estadoAtual[0] - estadoFinal[0]) + abs(estadoAtual[1] - estadoFinal[1])
+            return abs(estadoAtual[0] - estadoFinal[0]) + abs(estadoAtual[1] - estadoFinal[1])
 
         def heuristica2(self, estadoAtual, guardas):
             mod2 = self.modificadorRandom()
             valorh2 = min([self.heuristica(estadoAtual, guarda) for guarda in guardas])
             if valorh2 != 0:
-                return mod2 / valorh2
+                return 1 / valorh2
             else:
                 return 0
 
