@@ -11,7 +11,7 @@ if __name__ == "__main__":
         def __init__(self, parent, vertical=True, horizontal=False):
             super().__init__(parent)
 
-            #Configurando container para o conteúdo da janela
+            # Configurando container para o conteúdo da janela
             self._canvas = Canvas(self)
             self._canvas.grid(row=0, column=0, sticky='news')
             self._vertical_bar = Scrollbar(self, orient='vertical', command=self._canvas.yview)
@@ -27,10 +27,11 @@ if __name__ == "__main__":
 
         def frame_width(self, event):
             canvas_width = event.width
-            self._canvas.itemconfig(self._window, width = canvas_width)
+            self._canvas.itemconfig(self._window, width=canvas_width)
 
-        def resize(self, event=None): 
+        def resize(self, event=None):
             self._canvas.configure(scrollregion=self._canvas.bbox('all'))
+
 
     class Application:
         def __init__(self, master=None):
@@ -42,34 +43,36 @@ if __name__ == "__main__":
             self.primeiroContainer = Frame(master)
             self.primeiroContainer["pady"] = 10
             self.primeiroContainer.pack()
-    
+
             self.segundoContainer = Frame(master)
             self.segundoContainer["padx"] = 20
             self.segundoContainer.pack()
-    
+
             self.terceiroContainer = Frame(master)
             self.terceiroContainer["padx"] = 20
             self.terceiroContainer.pack()
-    
+
             self.quartoContainer = Frame(master)
             self.quartoContainer["padx"] = 20
             self.quartoContainer.pack()
-            
+
             self.quintoContainer = Frame(master)
             self.quintoContainer["pady"] = 20
             self.quintoContainer.pack()
-    
+
             self.titulo = Label(self.primeiroContainer, text="Prison's Heist")
             self.titulo["font"] = ("Arial", "10", "bold")
             self.titulo.pack()
-    
+
             self.titulo = Label(self.segundoContainer, text="RODADA 1")
             self.titulo["font"] = ("Arial", "8", "bold")
             self.titulo.pack()
-    
-            self.nomeLabel = Label(self.terceiroContainer,text="Digite as coordenadas do estado inicial entre 0 e 6 (Ex. 0,6)", font=self.fontePadrao)
+
+            self.nomeLabel = Label(self.terceiroContainer,
+                                   text="Digite as coordenadas do estado inicial entre 0 e 6 (Ex. 0,6)",
+                                   font=self.fontePadrao)
             self.nomeLabel.pack()
-    
+
             self.entrada = Entry(self.terceiroContainer)
             self.entrada["width"] = 30
             self.entrada["font"] = self.fontePadrao
@@ -81,7 +84,7 @@ if __name__ == "__main__":
             self.autenticar["width"] = 20
             self.autenticar["command"] = self.rodarJogo
             self.autenticar.pack()
-    
+
             self.mensagem = Label(self.quartoContainer, text="", font=self.fontePadrao)
             self.mensagem["fg"] = "red"
             self.mensagem.pack()
@@ -102,17 +105,25 @@ if __name__ == "__main__":
             self.saida.pack()
 
         # Heurística Definitions
-        def heuristica(self,estadoAtual, estadoFinal):
-            return abs(estadoAtual[0] - estadoFinal[0]) + abs(estadoAtual[1] - estadoFinal[1])
-        def heuristica2(self,estadoAtual, guardas):
+        def heuristica(self, estadoAtual, estadoFinal):
+            mod = self.modificadorRandom()
+            return mod*abs(estadoAtual[0] - estadoFinal[0]) + abs(estadoAtual[1] - estadoFinal[1])
+
+        def heuristica2(self, estadoAtual, guardas):
+            mod2 = self.modificadorRandom()
             valorh2 = min([self.heuristica(estadoAtual, guarda) for guarda in guardas])
             if valorh2 != 0:
-                return 1/valorh2
+                return mod2 / valorh2
             else:
                 return 0
 
+        def modificadorRandom(self):
+            modificador = randint(3,8)
+            return modificador
+
         # A* Definition
-        def search(self,estadoInicial, estadoFinal, bloqueios, guardas, heuristica, heuristica2, listaAberta, listaFechada, arvore):
+        def search(self, estadoInicial, estadoFinal, bloqueios, guardas, heuristica, heuristica2, listaAberta,
+                   listaFechada, arvore):
             estadoAtual = estadoInicial
             arvore.append(estadoInicial)
 
@@ -129,7 +140,8 @@ if __name__ == "__main__":
             # busca
             while estadoAtual != estadoFinal:
                 listaExpansao = getAdjacentes(estadoAtual, listaAberta, listaFechada, bloqueios, arvore)
-                listaAberta = abrirLista(listaExpansao, estadoInicial, estadoFinal, estadoAtual, listaAberta, listaFechada, heuristica, heuristica2, guardas, self.dot)
+                listaAberta = abrirLista(listaExpansao, estadoInicial, estadoFinal, estadoAtual, listaAberta,
+                                         listaFechada, heuristica, heuristica2, guardas, self.dot)
 
                 # fechar primeiro nó da listaAberta
                 try:
@@ -146,11 +158,10 @@ if __name__ == "__main__":
                 if len(listaAberta) != 0:
                     estadoAtual = listaAberta[0].estado
 
-                
                 passos += "Árvore expandindo!\n" + str(arvore) + "\n----\n"
                 passos += "Lista aberta expandindo!\n"
                 for node in listaAberta:
-                    passos += str(node.estado) + " "
+                    passos += "| " +str(node.estado) + "-F(n): " + str(node.total_F)[0:4]
                 passos += "\n----\n"
                 passos += "Lista Fechada expandindo!\n"
                 for node in listaFechada:
@@ -158,7 +169,7 @@ if __name__ == "__main__":
                 passos += "\n----\n"
 
                 self.passos["text"] = passos
-            
+
             # fim da busca
             listaFechada.append(listaAberta[0])
             return melhorCaminho(estadoAtual, estadoInicial, listaFechada)
@@ -168,7 +179,8 @@ if __name__ == "__main__":
             xfinal, yfinal = randint(0, 6), randint(0, 6)
             estadoFinal = (xfinal, yfinal)
             return estadoFinal
-        def blockConfig(self,estadoFinal, adjacentesFinal):
+
+        def blockConfig(self, estadoFinal, adjacentesFinal):
             qtdbloqueios = randint(3, 6)
             cordbloqueios_set = set()
             while len(cordbloqueios_set) < qtdbloqueios:
@@ -181,7 +193,8 @@ if __name__ == "__main__":
                         cordbloqueios_set.add((x, y))
             bloqueios = cordbloqueios_set
             return bloqueios
-        def guardaConfig(self,estadoFinal, bloqueios, adjacentesFinal):
+
+        def guardaConfig(self, estadoFinal, bloqueios, adjacentesFinal):
             qtdguardas = randint(2, 3)
             cordguardas_set = set()
             while len(cordguardas_set) < qtdguardas:
@@ -219,30 +232,36 @@ if __name__ == "__main__":
             listaAberta = []
             listaFechada = []
             arvore = []
-            
+
             for i in range(3):
                 self.resultado["text"] = ""
                 self.msgEstados["text"] = ""
-                self.tentativas = i + 1        
+                self.tentativas = i + 1
                 self.titulo["text"] = ("RODADA " + str(self.tentativas))
-                estadoInicial = self.solicitarEstadoInicial(self.entrada.get(),estadoFinal, bloqueios, guardas)
-                if(estadoInicial == None):
+                estadoInicial = self.solicitarEstadoInicial(self.entrada.get(), estadoFinal, bloqueios, guardas)
+                if (estadoInicial == None):
                     return None
-                caminho = self.search(estadoInicial, estadoFinal, bloqueios, guardas, self.heuristica, self.heuristica2, listaAberta, listaFechada, arvore)
+                caminho = self.search(estadoInicial, estadoFinal, bloqueios, guardas, self.heuristica, self.heuristica2,
+                                      listaAberta, listaFechada, arvore)
 
                 # Results
                 foiPreso = False
                 if caminho:
                     textoEstado = ''
-                    for estado in caminho:   
-                        valorFnTotal = self.heuristica(estado, estadoFinal) + self.heuristica2(estado, guardas)
-                        textoEstado += ('Estado: ' + str(estado) + ' F(n): ' + str(valorFnTotal) + '\n') 
+                    i = 0
+                    for estado in caminho:
+                        valorHnTotal = self.heuristica(estado, estadoFinal)
+                        valorH2nTotal = self.heuristica2(estado, guardas)
+                        textoEstado += ('Estado: ' + str(estado) + "F(n): " + str(valorHnTotal+valorH2nTotal+i)[0:4] + " = "
+                        + str(i) + " + " + str(valorHnTotal)[0:4] + " + " + str(valorH2nTotal)[0:4] + '\n')
                         if (estado in guardas):
                             textoResultado = "DERROTA - Havia um guarda em seu caminho"
                             self.qtdDerrotas += 1
                             foiPreso = True
                             break
-                    self.msgEstados["text"] = textoEstado
+                        i += 1
+                    caminhoResultante = "Caminho Resultante"
+                    self.msgEstados["text"] = caminhoResultante + "\n " + textoEstado
                 if not foiPreso:
                     break
                 else:
@@ -262,10 +281,12 @@ if __name__ == "__main__":
                 self.resultado["text"] = " GAME OVER - Literalmente, não havia uma rota de fuga! Que azar!"
             else:
                 self.resultado["fg"] = "green"
-                self.resultado["text"] = (" VITÓRIA - Você fugiu em " + str(self.tentativas) + " tentativa(s)\n Quantidade de Movimentos: " + str(len(caminho) - 1))
+                self.resultado["text"] = (" VITÓRIA - Você fugiu em " + str(
+                    self.tentativas) + " tentativa(s)\n Quantidade de Movimentos: " + str(len(caminho) - 1))
 
-            self.mapa["text"] = ("MAPA DO JOGO\nBloqueios: " + str(bloqueios) + "\nGuardas: " + str(guardas) + "\nEstado Final: " + str(estadoFinal))
-            if(not self.index):
+            self.mapa["text"] = ("MAPA DO JOGO\nBloqueios: " + str(bloqueios) + "\nGuardas: " + str(
+                guardas) + "\nEstado Final: " + str(estadoFinal))
+            if (not self.index):
                 textoAberto = ""
                 listaAberta.pop(0)
                 for no in listaAberta:
@@ -275,8 +296,10 @@ if __name__ == "__main__":
                 for no in listaFechada:
                     textoFechado += str(no.estado) + " "
 
-                self.saida["text"] = ("SAÍDA DO ALGORITMO\nNós abertos:" + textoAberto + "\nNós fechados:" + textoFechado + "\nÁrvore:" + str(arvore))
-                
+                self.saida["text"] = (
+                            "SAÍDA DO ALGORITMO\nNós abertos:" + textoAberto + "\nNós fechados:" + textoFechado + "\nÁrvore:" + str(
+                        arvore))
+
                 self.dot.render('tree.gv', view=False, format='png')
                 img = ImageTk.PhotoImage(file='tree.gv.png')
                 canvas = Canvas(self.quartoContainer, width=1000, height=1000)
@@ -284,7 +307,8 @@ if __name__ == "__main__":
                 canvas.pack()
                 canvas.create_image(0, 0, anchor="nw", image=img)
                 canvas.imageList.append(img)
-            
+
+
     root = Tk()
     root.geometry("600x600")
     root.title("Prison's Heist")
