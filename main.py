@@ -32,7 +32,6 @@ if __name__ == "__main__":
         def resize(self, event=None):
             self._canvas.configure(scrollregion=self._canvas.bbox('all'))
 
-
     class Application():
         def __init__(self, estadoFinal, adjacentesFinal, bloqueios, guardas, master=None):
             self.tentativas = 0
