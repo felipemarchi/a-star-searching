@@ -112,7 +112,6 @@ if __name__ == "__main__":
             return abs(estadoAtual[0] - estadoFinal[0]) + abs(estadoAtual[1] - estadoFinal[1])
 
         def heuristica2(self, estadoAtual, guardas):
-            mod2 = self.modificadorRandom()
             valorh2 = min([self.heuristica(estadoAtual, guarda) for guarda in guardas])
             if valorh2 != 0:
                 return 1 / valorh2
@@ -124,8 +123,7 @@ if __name__ == "__main__":
             return modificador
 
         # A* Definition
-        def search(self, estadoInicial, estadoFinal, bloqueios, guardas, heuristica, heuristica2, listaAberta,
-                   listaFechada, arvore):
+        def search(self, estadoInicial, estadoFinal, bloqueios, guardas, heuristica, heuristica2, listaAberta, listaFechada, arvore):
             estadoAtual = estadoInicial
             arvore.append(estadoInicial)
 
